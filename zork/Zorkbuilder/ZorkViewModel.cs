@@ -20,7 +20,7 @@ namespace Zorkbuilder
 
         public BindingList<Room> Rooms { get; set; }
 
-        
+        public string WelcomeMessage { get; set; }
 
         public Game Game
         {
@@ -65,21 +65,16 @@ namespace Zorkbuilder
                 serializer.Serialize(jsonWriter, Game);
             }
         }
-        public void RemoveRoom(Room roomToRemove)
+        /*
+        public void RemoveRoom(Room room)
         {
-            if (Rooms.Remove(roomToRemove))
+            foreach (Room rooms in Rooms)
             {
-                var neighbors = from room in Rooms
-                                from neighbor in room.Neighbors
-                                where neighbor.Value == roomToRemove
-                                select (Room: room, Direction: neighbor.Key);
-
-                foreach ((Room room, Directions direction) in neighbors)
-                {
-                    room.Neighbors.Remove(direction);
-                }
+                rooms.Name.Remove(room);
             }
-            //Room.Remove(room);
+
+            Room.Remove(room);
         }
+        */
     }
 }

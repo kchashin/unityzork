@@ -378,11 +378,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\ka893002\\Downloads\\NewZork\\NewZork\\zorkbuildercurrent\\zorkbuilder2\\zork\\zork.common\\zork.common.csproj",
+      "projectUniqueName": "C:\\Users\\ka893002\\Downloads\\zorkbuilder2\\zorkbuilder2\\zork\\zork.common\\zork.common.csproj",
       "projectName": "zork.common",
-      "projectPath": "C:\\Users\\ka893002\\Downloads\\NewZork\\NewZork\\zorkbuildercurrent\\zorkbuilder2\\zork\\zork.common\\zork.common.csproj",
+      "projectPath": "C:\\Users\\ka893002\\Downloads\\zorkbuilder2\\zorkbuilder2\\zork\\zork.common\\zork.common.csproj",
       "packagesPath": "C:\\Users\\ka893002\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\ka893002\\Downloads\\NewZork\\NewZork\\zorkbuildercurrent\\zorkbuilder2\\zork\\zork.common\\obj\\",
+      "outputPath": "C:\\Users\\ka893002\\Downloads\\zorkbuilder2\\zorkbuilder2\\zork\\zork.common\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Microsoft\\Xamarin\\NuGet\\",

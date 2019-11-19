@@ -1,78 +1,121 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Newtonsoft.Json;
-using System.Linq;
+using System;
 using System.IO;
+using Newtonsoft.Json;
+using zork.common;
+
+
 
 namespace zork.common
 {
     public class Game
     {
-        
-        public World World { get; private set; }
+
+        public IOutputService Output { get; private set; }
+
+        public IInputService Input { get; private set; }
+
+        public World World { get; set; }
 
         [JsonIgnore]
         public Player Player { get; private set; }
 
         [JsonIgnore]
-        private bool IsRunning { get; set; }
+        public bool IsRunning { get; private set; }
 
-        public Game(World world, Player player = null)
+        [JsonIgnore]
+        public CommandManager CommandManager { get; }
+
+        public Game(World world, Player player)
         {
             World = world;
             Player = player;
         }
 
-        public void Run()
+        public Game()
         {
-            IsRunning = true;
-            Room previousRoom = null;
-            while (IsRunning)
+            Command[] commands =
             {
-                Console.WriteLine(Player.Location);
-                if (previousRoom != Player.Location)
-                {
-                    Console.WriteLine(Player.Location.Description);
-                    previousRoom = Player.Location;
-                }
-                Console.WriteLine("\n>");
-                Commands command = ToCommand(Console.ReadLine().TrimEnd());
+                new Command("LOOK", new string[] { "LOOK", "L" },
+                    (game, commandContext) => Output.WriteLine($"{game.Player.Location.Name}\n{game.Player.Location.Description}")),
 
-                switch (command)
-                {
-                    case Commands.QUIT:
-                        IsRunning = false;
-                        break;
+                new Command("QUIT", new string[] { "QUIT", "Q" },
+                    (game, commandContext) => game.IsRunning = false),
 
-                    case Commands.LOOK:
-                        Console.WriteLine(Player.Location.Description);
-                        break;
+                new Command("NORTH", new string[] { "NORTH", "N" }, MovementCommands.North),
 
-                    case Commands.NORTH:
-                    case Commands.SOUTH:
-                    case Commands.EAST:
-                    case Commands.WEST:
-                        Directions direction = (Directions)Enum.Parse(typeof(Directions), command.ToString(), true);
-                        if (Player.Move(direction) == false)
-                        {
-                            Console.WriteLine("The way is shut!");
-                        }
-                        break;
+                new Command("SOUTH", new string[] { "SOUTH", "S" }, MovementCommands.South),
 
-                    default:
-                        Console.WriteLine("Unknown command.");
-                        break;
-                }
-            }
+                new Command("EAST", new string[] { "EAST", "E" }, MovementCommands.East),
+
+                new Command("WEST", new string[] { "WEST", "W" }, MovementCommands.West),
+
+                new Command("REWARD",new string[]{"REWARD", "R" }, Reward ),
+
+                new Command ("SCORE", "Score", Score)
+
+            };
+
+            CommandManager = new CommandManager(commands);
         }
 
-        public static Game Load(string filename)
+        private static void Quit(Game game, CommandContext commandContext)
         {
-            Game game = JsonConvert.DeserializeObject<Game>(File.ReadAllText(filename));
+            game.IsRunning = false;
+        }
+
+        private static void Reward(Game game, CommandContext commandContext)
+        {
+            game.Player.Score++;
+            game.Output.WriteLine("You have been awarded 1 point!");
+
+        }
+
+        private static void Score(Game game, CommandContext commandContext)
+        {
+            game.Output.WriteLine($"Your score would be {game.Player.Score}, in {game.Player.Moves} move(s)");
+        }
+
+        public static Game LoadFromFile(string filename, IOutputService output, IInputService input)
+        {
+            return Load(File.ReadAllText(filename), output, input);
+        }
+
+        public static Game Load(string jsonString, IOutputService output, IInputService input)
+        {
+            Game game = JsonConvert.DeserializeObject<Game>(jsonString);
+            game.Output = output;
+            game.Input = input;
             game.Player = game.World.SpawnPlayer();
+            game.IsRunning = true;
+            game.Input.InputReceived += game.InputReceived;
+            output.WriteLine("Welcome to Zork!");
+            game.CommandManager.PerformCommand(game, "LOOK");
+
+
+
+
             return game;
         }
-        private static Commands ToCommand(string commandString) => Enum.TryParse<Commands>(commandString, true, out Commands result) ? result : Commands.UNKNOWN;
+
+        private void InputReceived(object sender, string inputString)
+        {
+           Room previousRoom = Player.Location;
+           if (CommandManager.PerformCommand(this, inputString))
+           {
+               Player.Moves++;
+                if(previousRoom != Player.Location)
+                {
+                    CommandManager.PerformCommand(this, "Look");
+                    previousRoom = Player.Location;
+                }
+           }
+           else
+           {
+               Output.WriteLine("That's not a verb I recognize.");
+           }
+        }
+        
+
     }
 }
+
