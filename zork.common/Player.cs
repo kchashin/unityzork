@@ -10,9 +10,31 @@ namespace zork.common
 {
     public class Player : INotifyPropertyChanged
     {
+     //   private int zScore;
+
+   //   public int Score
+   //   {
+   //       get => zScore;
+   //       set
+   //       {
+   //           zScore = value;
+   //          ScoreChanger?.Invoke(this, ScoreText.text);
+   //       }
+   //   }
+
         public event PropertyChangedEventHandler PropertyChanged;
 
+        public event EventHandler<int> ScoreChanged;
+        
+        public event EventHandler<int> MovesChanged;
 
+        public event EventHandler<int> LocationChanged;
+
+        public int Moves { get; set; }
+
+        public int Score { get; set; }
+
+        public int Health { get; set; }
 
         public World World { get; }
 
@@ -45,5 +67,11 @@ namespace zork.common
             }
             return isValidMove;
         }
+
+        
+
+
+
+
     }
 }
